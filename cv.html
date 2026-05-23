@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Profesional Pro | Plantillas + Webcam + Reset</title>
+  <style>
+    :root {
+      --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --muted: #475569;
+      --accent: #2563eb; --accent-light: #dbeafe; --border: #e2e8f0;
+      --font-main: system-ui, -apple-system, sans-serif;
+      --radius: 10px; --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --danger: #ef4444; --danger-light: #fee2e2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-main); background: var(--bg); color: var(--text); line-height: 1.5; }
+    .app { display: grid; grid-template-columns: 1fr 380px; gap: 24px; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    
+    /* 📄 PREVIEW CV BASE */
+    .cv-preview { background: var(--card); padding: 32px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; transition: all 0.3s ease; min-height: 800px; }
+    .cv-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+    .cv-photo { width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 3px solid var(--accent); flex-shrink: 0; background: var(--accent-light); }
+    #webcam, #photo-canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #photo-canvas { display: none; }
+    .cv-title h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .cv-title h2 { font-size: 16px; color: var(--muted); font-weight: 500; }
+    .cv-contact { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0 16px; font-size: 13px; color: var(--muted); }
+    .cv-contact span::before { content: "•"; margin-right: 6px; color: var(--accent); }
+    .cv-section { margin-bottom: 18px; }
+    .cv-section h3 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); border-bottom: 2px solid var(--accent-light); padding-bottom: 6px; margin-bottom: 10px; }
+    .cv-item { margin-bottom: 12px; }
+    .cv-item-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
+    .cv-item-header h4 { font-size: 14px; font-weight: 600; }
+    .cv-item-header span { font-size: 12px; color: var(--muted); }
+    .cv-item ul { margin-left: 16px; margin-top: 4px; font-size: 13px; color: var(--text); }
+    .cv-item li { margin-bottom: 3px; }
+    .cv-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cv-tag { background: var(--accent-light); color: var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .cv-grid > .cv-section:last-child { margin-bottom: 0; }
+
+    /*  PLANTILLAS INTERCAMBIABLES */
+    .cv-preview.ejecutivo {
+      --accent: #0f172a; --accent-light: #cbd5e1; --bg-preview: #f8fafc;
+      --radius: 0; --shadow: none; --font-main: Georgia, 'Times New Roman', serif;
+      border-left: 4px solid var(--accent); padding-left: 24px; background: var(--bg-preview);
+    }
+    .cv-preview.ejecutivo .cv-title h1 { font-weight: 400; letter-spacing: 0.5px; }
+    .cv-preview.ejecutivo .cv-contact span::before { color: var(--accent); content: "▸"; }
+    .cv-preview.ejecutivo .cv-section h3 { border-bottom: 1px solid var(--border); text-transform: none; font-weight: 600; }
+    .cv-preview.ejecutivo .cv-tag { background: transparent; border: 1px solid var(--accent); border-radius: 0; color: var(--accent); }
+
+    .cv-preview.minimal {
+      --accent: #334155; --accent-light: #f1f5f9; --bg-preview: #ffffff;
+      --radius: 0; --shadow: none; --font-main: 'Helvetica Neue', Arial, sans-serif;
+      padding: 0; border: 1px solid #e2e8f0;
+    }
+    .cv-preview.minimal .cv-header { flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .cv-preview.minimal .cv-photo { width: 80px; height: 80px; border: 2px solid var(--accent); }
+    .cv-preview.minimal .cv-title h1 { font-weight: 300; font-size: 32px; letter-spacing: 1px; }
+    .cv-preview.minimal .cv-contact { margin: 0 0 20px; font-size: 12px; }
+    .cv-preview.minimal .cv-contact span::before { content: "|"; margin-right: 4px; color: var(--muted); }
+    .cv-preview.minimal .cv-section h3 { border-bottom: none; font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+    .cv-preview.minimal .cv-tag { background: var(--bg); border-radius: 12px; font-weight: 400; }
+
+    .cv-preview.creativo {
+      --accent: #7c3aed; --accent-light: #ede9fe; --bg-preview: #ffffff;
+      --radius: 14px; --shadow: 0 8px 24px rgba(124,58,237,0.15);
+      --font-main: system-ui, sans-serif;
+      background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+    }
+    .cv-preview.creativo .cv-title h1 { background: linear-gradient(90deg, var(--accent), #2563eb); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .cv-preview.creativo .cv-contact span::before { content: ""; color: var(--accent); }
+    .cv-preview.creativo .cv-section h3 { border-bottom: 3px dotted var(--accent-light); }
+    .cv-preview.creativo .cv-tag { background: var(--accent); color: white; border-radius: 20px; padding: 6px 12px; }
+
+    /* 🛠️ EDITOR */
+    .editor { background: var(--card); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); height: fit-content; position: sticky; top: 20px; max-height: 90vh; overflow-y: auto; }
+    .editor h3 { margin-bottom: 12px; font-size: 16px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--muted); }
+    input, textarea, select { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 13px; transition: border 0.2s; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+    textarea { resize: vertical; min-height: 60px; }
+    
+    /* BOTONES */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent); color: white; border: none; padding: 9px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; margin-top: 8px; width: 100%; transition: 0.2s; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn.secondary { background: var(--border); color: var(--text); }
+    .btn.small { padding: 6px 10px; font-size: 12px; margin-top: 4px; }
+    
+    /* Botón de peligro (Reset) */
+    .btn.danger { background: #ef4444; color: white; border: 1px solid #dc2626; margin-top: 16px; }
+    .btn.danger:hover { background: #dc2626; }
+
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .dynamic-list { margin-top: 6px; }
+    .dynamic-item { background: var(--bg); padding: 10px; border-radius: 6px; margin-bottom: 8px; position: relative; }
+    .dynamic-item .remove { position: absolute; top: 6px; right: 6px; background: #ef4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    /* 🖨️ PRINT / PDF */
+    @media print {
+      body { background: white !important; }
+      .app { grid-template-columns: 1fr; gap: 0; margin: 0; padding: 0; }
+      .editor, .btn, select, label { display: none !important; }
+      .cv-preview { box-shadow: none !important; border: none !important; padding: 20mm !important; background: white !important; width: 100%; }
+      #webcam, #photo-canvas { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cv-section { page-break-inside: avoid; }
+      * { text-shadow: none !important; box-shadow: none !important; transform: none !important; }
+      @page { margin: 0; size: A4; }
+    }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .editor { position: static; max-height: none; }
+      .cv-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 📄 PREVIEW -->
+    <div class="cv-preview moderno" id="cv-preview">
+      <div class="cv-header">
+        <div class="cv-photo">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="photo-canvas"></canvas>
+        </div>
+        <div class="cv-title">
+          <h1 id="p-name">Nombre Completo</h1>
+          <h2 id="p-title">Cargo / Especialidad</h2>
+        </div>
+      </div>
+      <div class="cv-contact" id="p-contact">
+        <span id="p-email">email@ejemplo.com</span>
+        <span id="p-phone">+00 000 000 000</span>
+        <span id="p-location">Ciudad, País</span>
+        <span id="p-linkedin">linkedin.com/in/usuario</span>
+        <span id="p-portfolio">portfolio.com</span>
+      </div>
+
+      <div class="cv-section">
+        <h3>Perfil Profesional</h3>
+        <p id="p-summary" style="font-size:13px;">Resumen ejecutivo de tu experiencia, logros clave y objetivo profesional...</p>
+      </div>
+
+      <div class="cv-section">
+        <h3>Experiencia Laboral</h3>
+        <div id="p-exp-list"></div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Formación Académica</h3>
+        <div id="p-edu-list"></div>
+      </div>
+
+      <div class="cv-grid">
+        <div class="cv-section">
+          <h3>Habilidades</h3>
+          <div class="cv-tags" id="p-skills"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Idiomas</h3>
+          <div class="cv-tags" id="p-langs"></div>
+        </div>
+      </div>
+
+      <div class="cv-section">
+        <h3>Certificaciones & Proyectos</h3>
+        <div id="p-certs"></div>
+      </div>
+    </div>
+
+    <!-- 🛠️ EDITOR -->
+    <div class="editor">
+      <h3>📝 Editor CV Profesional</h3>
+      <div class="form-group">
+        <label>🎨 Plantilla Activa</label>
+        <select id="tpl-select" onchange="changeTemplate(this.value)">
+          <option value="moderno">🔵 Moderno (Default)</option>
+          <option value="ejecutivo">⚫ Ejecutivo (Serif/Corporativo)</option>
+          <option value="minimal">⚪ Minimal (Tipográfico/Limpio)</option>
+          <option value="creativo">🟣 Creativo (Gradientes/Bold)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Nombre Completo</label><input type="text" id="f-name" placeholder="Ej: Ana García López"></div>
+      <div class="form-group"><label>Cargo / Especialidad</label><input type="text" id="f-title" placeholder="Ej: Ingeniera de Software Senior"></div>
+      <div class="cv-grid">
+        <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="correo@dominio.com"></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="f-phone" placeholder="+34 600 000 000"></div>
+      </div>
+      <div class="form-group"><label>Ubicación</label><input type="text" id="f-location" placeholder="Madrid, España"></div>
+      <div class="form-group"><label>LinkedIn / Portfolio</label><input type="text" id="f-linkedin" placeholder="linkedin.com/in/tuusuario"></div>
+      <div class="form-group"><label>Perfil Profesional</label><textarea id="f-summary" rows="3" placeholder="2-3 líneas destacando valor, experiencia y objetivo..."></textarea></div>
+
+      <div class="divider"></div><h3>💼 Experiencia</h3>
+      <div id="editor-exp" class="dynamic-list"></div>
+      <button class="btn small secondary" onclick="addExp()">+ Añadir Experiencia</button>
+
+      <div class="divider"></div><h3>🎓 Formación</h3>
+      <div id="editor-edu" class="dynamic-list"></div>
+      <button class="btn small secondary" onclick="addEdu()">+ Añadir Formación</button>
+
+      <div class="divider"></div>
+      <div class="form-group"><label>Habilidades (separadas por coma)</label><textarea id="f-skills" rows="2" placeholder="JavaScript, Gestión de proyectos, SQL, Liderazgo..."></textarea></div>
+      <div class="form-group"><label>Idiomas (separados por coma)</label><textarea id="f-langs" rows="2" placeholder="Español (Nativo), Inglés (C1), Francés (B1)"></textarea></div>
+      <div class="form-group"><label>Certificaciones & Proyectos</label><textarea id="f-certs" rows="3" placeholder="• AWS Certified Solutions Architect (2024)
+• Desarrollo de App interna que redujo costes un 18%"></textarea></div>
+
+      <div class="divider"></div>
+      <button class="btn" onclick="capturePhoto()">📸 Congelar Foto</button>
+      <button class="btn secondary" onclick="resetPhoto()">🔄 Activar Webcam</button>
+      <button class="btn" onclick="window.print()">📄 Guardar PDF / Imprimir</button>
+      
+      <!-- 🔴 NUEVO BOTÓN DE RESET -->
+      <button class="btn danger" onclick="resetCV()">🗑️ Reiniciar CV (Nuevo)</button>
+      
+      <p style="font-size:11px; color:#64748b; margin-top:8px; text-align:center;"> Se guarda automáticamente</p>
+    </div>
+  </div>
+
+  <script>
+    // 🌐 WEBCAM
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('photo-canvas');
+    let streamRef = null;
+
+    async function startCam() {
+      // Parar stream anterior si existe
+      if(streamRef) streamRef.getTracks().forEach(track => track.stop());
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 320, height: 320 } });
+        streamRef = stream;
+        video.srcObject = stream; 
+        canvas.style.display = 'none'; 
+        video.style.display = 'block';
+      } catch(e) { console.log('Esperando permisos de cámara...'); }
+    }
+
+    function capturePhoto() {
+      canvas.width = video.videoWidth; 
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      video.style.display = 'none'; 
+      canvas.style.display = 'block';
+      if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+      streamRef = null;
+    }
+
+    function resetPhoto() { 
+      canvas.style.display='none'; 
+      video.style.display='block'; 
+      startCam(); 
+    }
+
+    // 🔄 LIVE SYNC & LOCALSTORAGE
+    const map = {'f-name':'p-name', 'f-title':'p-title', 'f-email':'p-email', 'f-phone':'p-phone', 'f-location':'p-location', 'f-linkedin':'p-linkedin', 'f-summary':'p-summary'};
+    const saveKey = 'cv-pro-data';
+
+    function syncAll() {
+      Object.entries(map).forEach(([inp, out]) => {
+        const val = document.getElementById(inp).value;
+        document.getElementById(out).textContent = val || (inp==='f-name'?'Nombre Completo':inp==='f-title'?'Cargo / Especialidad':inp==='f-summary'?'Resumen ejecutivo...':'');
+      });
+      renderTags('f-skills', 'p-skills'); 
+      renderTags('f-langs', 'p-langs'); 
+      renderTextBlocks('f-certs', 'p-certs'); 
+      renderList('editor-exp', 'p-exp-list'); 
+      renderList('editor-edu', 'p-edu-list');
+    }
+
+    function renderTags(inpId, outId) { 
+      const val = document.getElementById(inpId).value; 
+      document.getElementById(outId).innerHTML = val ? val.split(',').map(t => `<span class="cv-tag">${t.trim()}</span>`).join('') : ''; 
+    }
+    
+    function renderTextBlocks(inpId, outId) { 
+      const val = document.getElementById(inpId).value.trim(); 
+      document.getElementById(outId).innerHTML = val ? `<pre style="margin:0; font-size:13px; white-space:pre-wrap; font-family:inherit;">${val}</pre>` : ''; 
+    }
+
+    // 📦 DYNAMIC LISTS
+    function addExp(data={}) {
+      const div = document.createElement('div'); div.className = 'dynamic-item';
+      div.innerHTML = `<button class="remove" onclick="this.parentElement.remove(); save(); syncAll();">×</button>
+        <div class="form-group"><label>Empresa / Rol</label><input class="exp-role" value="${data.role||''}" placeholder="Ej: Google • Desarrollador Frontend"></div>
+        <div class="form-group"><label>Fechas</label><input class="exp-dates" value="${data.dates||''}" placeholder="Ene 2021 - Actualidad"></div>
+        <div class="form-group"><label>Logros (1 por línea)</label><textarea class="exp-desc" rows="2" placeholder="• Lideré migración a React\n• Reduje carga de página en 40%"></textarea></div>`;
+      document.getElementById('editor-exp').appendChild(div); 
+      syncAll();
+    }
+
+    function addEdu(data={}) {
+      const div = document.createElement('div'); div.className = 'dynamic-item';
+      div.innerHTML = `<button class="remove" onclick="this.parentElement.remove(); save(); syncAll();">×</button>
+        <div class="form-group"><label>Título / Institución</label><input class="edu-role" value="${data.role||''}" placeholder="Ej: Máster en Data Science • Universidad X"></div>
+        <div class="form-group"><label>Fechas</label><input class="edu-dates" value="${data.dates||''}" placeholder="2018 - 2020"></div>`;
+      document.getElementById('editor-edu').appendChild(div); 
+      syncAll();
+    }
+
+    function renderList(editorId, previewId) {
+      const container = document.getElementById(previewId); container.innerHTML = '';
+      document.querySelectorAll(`#${editorId} .dynamic-item`).forEach(item => {
+        const role = item.querySelector('input').value; const dates = item.querySelectorAll('input')[1]?.value || '';
+        const desc = item.querySelector('textarea')?.value || '';
+        if(!role && !desc) return;
+        container.insertAdjacentHTML('beforeend', `<div class="cv-item"><div class="cv-item-header"><h4>${role}</h4><span>${dates}</span></div>${desc ? `<ul>${desc.split('\n').filter(l=>l.trim()).map(l=>`<li>${l.replace(/^[-•]\s*/,'')}</li>`).join('')}</ul>` : ''}</div>`);
+      });
+    }
+
+    // 💾 SAVE/LOAD & PLANTILLAS
+    function save() {
+      const data = { 
+        inputs: {}, exp: [], edu: [], 
+        skills: document.getElementById('f-skills').value, 
+        langs: document.getElementById('f-langs').value, 
+        certs: document.getElementById('f-certs').value, 
+        template: document.getElementById('tpl-select').value 
+      };
+      Object.keys(map).forEach(k => data.inputs[k] = document.getElementById(k).value);
+      document.querySelectorAll('#editor-exp .dynamic-item').forEach(i => data.exp.push({role:i.querySelector('.exp-role').value, dates:i.querySelector('.exp-dates').value, desc:i.querySelector('.exp-desc').value}));
+      document.querySelectorAll('#editor-edu .dynamic-item').forEach(i => data.edu.push({role:i.querySelector('.edu-role').value, dates:i.querySelector('.edu-dates').value}));
+      localStorage.setItem(saveKey, JSON.stringify(data));
+    }
+
+    function load() {
+      const raw = localStorage.getItem(saveKey); if(!raw) return;
+      try {
+        const d = JSON.parse(raw);
+        Object.entries(d.inputs||{}).forEach(([k,v]) => { if(document.getElementById(k)) document.getElementById(k).value = v; });
+        document.getElementById('f-skills').value = d.skills||''; 
+        document.getElementById('f-langs').value = d.langs||''; 
+        document.getElementById('f-certs').value = d.certs||'';
+        (d.exp||[]).forEach(addExp); 
+        (d.edu||[]).forEach(addEdu);
+        if(d.template) changeTemplate(d.template);
+        syncAll();
+      } catch(e){}
+    }
+
+    //  CAMBIO DE PLANTILLA
+    function changeTemplate(tpl) {
+      const cv = document.getElementById('cv-preview');
+      cv.className = 'cv-preview ' + tpl;
+      document.getElementById('tpl-select').value = tpl;
+      localStorage.setItem('cv-pro-template', tpl);
+    }
+
+    // ️ RESET FUNCTION (NUEVA Y SEGURA)
+    function resetCV() {
+      if(!confirm("⚠️ ¿Seguro que quieres borrar todo y empezar un CV nuevo?\nEsto eliminará todos tus datos actuales.")) return;
+      
+      // 1. Vaciar campos simples
+      document.querySelectorAll('.editor input, .editor textarea').forEach(el => el.value = '');
+      
+      // 2. Limpiar listas dinámicas
+      document.getElementById('editor-exp').innerHTML = '';
+      document.getElementById('editor-edu').innerHTML = '';
+      
+      // 3. Reset plantilla y selector
+      changeTemplate('moderno');
+      document.getElementById('tpl-select').value = 'moderno';
+      
+      // 4. Borrar memoria
+      localStorage.removeItem('cv-pro-data');
+      localStorage.removeItem('cv-pro-template');
+      
+      // 5. Refrescar vista previa
+      syncAll();
+      
+      // 6. Reactivar cámara
+      resetPhoto();
+    }
+
+    // 🎯 INIT
+    document.addEventListener('input', e => { save(); syncAll(); });
+    window.onload = () => { 
+      startCam(); 
+      const savedTpl = localStorage.getItem('cv-pro-template') || 'moderno';
+      document.getElementById('tpl-select').value = savedTpl;
+      changeTemplate(savedTpl);
+      load(); 
+    };
+  </script>
+</body>
+</html>
