@@ -46,6 +46,40 @@ Just open:
 
 ```bash
 index.html
+
+
+THUNDERBLUE CV CORE
+
+Un generador de CV profesional construido completamente en un único archivo HTML.
+
+Sin frameworks.
+Sin dependencias.
+Sin backend.
+Sin instalación.
+
+Solo HTML + CSS + JavaScript puro.
+
+Características:
+• Editor visual en tiempo real
+• Webcam integrada para foto de perfil
+• Exportación PDF optimizada
+• Persistencia automática con LocalStorage
+• Sistema de plantillas dinámicas
+• Responsive
+• Funciona offline
+• Arquitectura self-contained
+
+El objetivo no era hacer “otro creador de CV”.
+
+El objetivo era demostrar hasta dónde puede llegar una aplicación web moderna usando únicamente tecnologías nativas y un solo archivo.
+
+ThunderBlue System Core.
+
+GitHub:
+https://github.com/munozcorominase-jpg/thunderblue-cv-core
+
+Vídeo demo incluido en el repositorio.
+
 ```
 
 No installation required.
